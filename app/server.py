@@ -54,7 +54,7 @@ async def homepage(request):
     return HTMLResponse(html_file.open().read())
 
 @app.route('/health')
-def health():
+def health(request):
     print("Your server is healthy! :)")
 
 @app.route('/analyze', methods=['POST'])
