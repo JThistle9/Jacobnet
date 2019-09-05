@@ -56,7 +56,6 @@ async def homepage(request):
 @app.route('/health')
 async def health(request):
     print("Health Check")
-    return "healthy"
 
 @app.route('/analyze', methods=['POST'])
 async def analyze(request):
