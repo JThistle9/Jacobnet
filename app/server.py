@@ -48,12 +48,15 @@ tasks = [asyncio.ensure_future(setup_learner())]
 learn = loop.run_until_complete(asyncio.gather(*tasks))[0]
 loop.close()
 
-
 @app.route('/')
 async def homepage(request):
     html_file = path / 'view' / 'index.html'
     return HTMLResponse(html_file.open().read())
 
+@app.route('/health')
+async def health(request):
+    print("Health Check")
+    return "healthy"
 
 @app.route('/analyze', methods=['POST'])
 async def analyze(request):
