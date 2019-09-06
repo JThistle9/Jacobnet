@@ -65,7 +65,7 @@ async def analyze(request):
 async def predict(request):
     img_bytes = await request.body()
     img = open_image(BytesIO(img_bytes))
-    prediction = learn.predict(img)[0]
+    prediction = learn.predict(img, thresh=0.7)[0]
     return PlainTextResponse(str(prediction))
     
 if __name__ == '__main__':
