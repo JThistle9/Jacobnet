@@ -6,7 +6,7 @@ from fastai.vision import *
 from io import BytesIO
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from starlette.staticfiles import StaticFiles
 
 export_file_url = 'https://drive.google.com/uc?export=download&id=1TUItuJk3EtLAVSjniE0mAzgmgwK7rH8k'
@@ -66,8 +66,7 @@ async def predict(request):
     img_bytes = await request.body()
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img)[0]
-    #response = JSONResponse({"prediction": str(prediction)})
-    return str(prediction)
+    return PlainTextResponse(str(prediction))
     
 if __name__ == '__main__':
     if 'serve' in sys.argv:
