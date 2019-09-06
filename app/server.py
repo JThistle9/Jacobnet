@@ -62,6 +62,11 @@ async def analyze(request):
     prediction = learn.predict(img)[0]
     return JSONResponse({'result': str(prediction)})
 
+@app.route('/predict', methods=['POST'])
+async def predict(request):
+    content = '%s %s' % (request.method, request.url.path)
+    response = Response(content, media_type='text/plain')
+    await response(scope, receive, send)
 
 if __name__ == '__main__':
     if 'serve' in sys.argv:
