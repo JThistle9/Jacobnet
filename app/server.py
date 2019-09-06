@@ -15,7 +15,7 @@ export_file_name = 'export.pkl'
 classes = ['jacob', 'not']
 path = Path(__file__).parent
 
-app = Starlette()
+app = Starlette(debug=True)
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_headers=['X-Requested-With', 'Content-Type'])
 app.mount('/static', StaticFiles(directory='app/static'))
 
