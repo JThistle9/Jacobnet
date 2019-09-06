@@ -62,21 +62,6 @@ async def analyze(request):
     prediction = learn.predict(img)[0]
     return JSONResponse({'result': str(prediction)})
 
-@app.route('/predict', methods=['POST'])
-async def predict(self, scope, receive, send):
-    websocket = WebSocket(scope=scope, receive=receive, send=send)
-    img_bytes = await websocket.receive_json(data, mode="binary")
-    img = open_image(BytesIO(img_bytes))
-    prediction = learn.predict(img)[0]
-    await websocket.send_json(prediction, mode="binary")
-    await websocket.close()
-#async def predict(request):
-#    await websocket.send_json(data)
-#   img = open_image(BytesIO(img_bytes))
-#    prediction = learn.predict(img)[0]
-#    response = JSONResponse({'prediction': str(prediction)})
-#    await response(scope, receive, send)
-
 
 if __name__ == '__main__':
     if 'serve' in sys.argv:
