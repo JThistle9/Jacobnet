@@ -8,6 +8,7 @@ from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
+from starlette.websockets import WebSocket
 
 export_file_url = 'https://drive.google.com/uc?export=download&id=1TUItuJk3EtLAVSjniE0mAzgmgwK7rH8k'
 export_file_name = 'export.pkl'
@@ -62,12 +63,19 @@ async def analyze(request):
     return JSONResponse({'result': str(prediction)})
 
 @app.route('/predict', methods=['POST'])
-async def predict(request):
-    img_byes = await request.body()
+async def predict(self, scope, receive, send):
+    websocket = WebSocket(scope=scope, receive=receive, send=send)
+    img_bytes = await websocket.receive_json(data, mode="binary")
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img)[0]
-    response = JSONResponse({'prediction': str(prediction)})
-    await response(scope, receive, send)
+    await websocket.send_json(prediction, mode="binary")
+    await websocket.close()
+#async def predict(request):
+#    await websocket.send_json(data)
+#   img = open_image(BytesIO(img_bytes))
+#    prediction = learn.predict(img)[0]
+#    response = JSONResponse({'prediction': str(prediction)})
+#    await response(scope, receive, send)
 
 
 if __name__ == '__main__':
