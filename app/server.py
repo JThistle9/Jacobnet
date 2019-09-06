@@ -66,7 +66,11 @@ async def analyze(request):
 async def predict(scope, receive, send):
     request = Request(scope, receive)
     img_body = await request.body()
-    img_bytes = img_data.decode()
+    print('img_body:')
+    print(img_body)
+    img_bytes = img_body.decode()
+    print('img_bytes:')
+    print(img_bytes)
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img)[0]
     response = JSONResponse({"prediction": str(prediction)})
