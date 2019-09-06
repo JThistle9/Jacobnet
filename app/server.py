@@ -62,13 +62,6 @@ async def analyze(request):
     prediction = learn.predict(img)[0]
     return JSONResponse({'result': str(prediction)})
 
-@app.route('/predict', methods=['POST'])
-async def predict(scope, receive, send):
-    request = Request(scope, receive)
-    content = '%s %s' % (request.method, request.url.path)
-    response = Response(content, media_type='text/plain')
-    await response(scope, receive, send)
-
 if __name__ == '__main__':
     if 'serve' in sys.argv:
         uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level="info")
