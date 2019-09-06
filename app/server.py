@@ -63,14 +63,16 @@ async def analyze(request):
 
 @app.route('/predict', methods=['POST'])
 async def predict(request):
-    img_body = await request.body()
-    print('img_body:')
-    print(img_body)
-    img_bytes = img_body.decode()
+    img_bytes = await request.body()
+    #print('img_body:')
+    #print(img_body)
+    #img_bytes = img_body.decode()
     print('img_bytes:')
     print(img_bytes)
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img)[0]
+    print('prediction:')
+    print(str(prediction))
     response = JSONResponse({"prediction": str(prediction)})
     return response
     
