@@ -63,7 +63,8 @@ async def analyze(request):
     return JSONResponse({'result': str(prediction)})
 
 @app.route('/predict', methods=['POST'])
-async def predict(request):
+async def predict(scope, receive, send):
+    request = Request(scope, receive)
     content = '%s %s' % (request.method, request.url.path)
     response = Response(content, media_type='text/plain')
     await response(scope, receive, send)
