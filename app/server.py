@@ -54,16 +54,18 @@ async def homepage(request):
     return HTMLResponse(html_file.open().read())
 
 @app.route('/analyze', methods=['POST'])
-async def analyze(scope, receive, send):
-    request = Request(scope, receive)
-    body = b''
-    async for chunk in request.stream():
-        body += chunk
-    #img_data = await request.form()
-    img_bytes = body.decode()
+async def analyze(request):
+    img_data = await request.form()
+    img_bytes = await (img_data['file'].read())
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img)[0]
-    #return JSONResponse({'result': str(prediction)})
+    return JSONResponse({'result': str(prediction)})
+
+@app.route('/predict', methods=['POST'])
+async def predict(request):
+    img_byes = await request.body()
+    img = open_image(BytesIO(img_bytes))
+    prediction = learn.predict(img)[0]
     response = JSONResponse({'prediction': str(prediction)})
     await response(scope, receive, send)
 
