@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import uvicorn
-import Image
+from PIL import Image
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
