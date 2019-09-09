@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import uvicorn
+import Image
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -13,6 +14,8 @@ export_file_url = 'https://drive.google.com/uc?export=download&id=1TUItuJk3EtLAV
 export_file_name = 'export.pkl'
 
 classes = ['jacob', 'not']
+not_saved = 0
+jacob_saved = 0
 path = Path(__file__).parent
 
 app = Starlette(debug=True)
@@ -67,6 +70,22 @@ async def predict(request):
     img = open_image(BytesIO(img_bytes))
     prediction = learn.predict(img, thresh=0.7)[0]
     return PlainTextResponse(str(prediction))
+
+@app.route('/save/test/{folder}', methods=['POST'])
+async def savetest(request):
+    print(folder)
+    img_bytes = await request.body()
+    image = Image.open(io.BytesIO(img_bytes))
+    path = './data/test' / folder
+    filename = ''
+    if folder == 'jacob':
+        jacob_saved = jacob_saved + 1
+        filename = 'jacob_from_app'+str(jacob_saved)+'.png'
+    if folder == 'not':
+        not_saved = not_saved + 1
+        filename = 'not_from_app'+str(not_saved)+'.png'
+    image.save(path / filename)
+    return PlainTextResponse('saved file ' + str(path) + '/' + filename)
     
 if __name__ == '__main__':
     if 'serve' in sys.argv:
