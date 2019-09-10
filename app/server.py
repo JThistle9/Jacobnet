@@ -77,6 +77,7 @@ async def savetestjacob(request):
     img_bytes = await request.body()
     image = PIL.Image.open(io.BytesIO(img_bytes))
     path = './data/test/jacob'
+    global jacob_saved
     jacob_saved = jacob_saved + 1
     filename = 'jacob_from_app'+str(jacob_saved)+'.png'
     image.save(path / filename)
@@ -88,6 +89,7 @@ async def savetestnot(request):
     img_bytes = await request.body()
     image = PIL.Image.open(io.BytesIO(img_bytes))
     path = './data/test/not'
+    global not_saved
     not_saved = not_saved + 1
     filename = 'not_from_app'+str(not_saved)+'.png'
     image.save(path / filename)
