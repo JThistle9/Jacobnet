@@ -94,10 +94,7 @@ async def savetestnot(request):
     filename = 'not_from_app'+str(not_saved)+'.png'
     image.save(path+filename)
     return PlainTextResponse('saved file ' + path + filename)
-        
-    image.save(path / filename)
-    return PlainTextResponse('saved file ' + path + filename)
-    
+
 if __name__ == '__main__':
     if 'serve' in sys.argv:
         uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level="info")
