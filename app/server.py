@@ -71,19 +71,28 @@ async def predict(request):
     prediction = learn.predict(img, thresh=0.7)[0]
     return PlainTextResponse(str(prediction))
 
-@app.route('/save/test/{folder}', methods=['POST'])
-async def savetest(request):
-    print(folder)
+@app.route('/save/test/jacob', methods=['POST'])
+async def savetestjacob(request):
+    print('saving to ./data/test/jacob')
     img_bytes = await request.body()
     image = Image.open(io.BytesIO(img_bytes))
-    path = './data/test' / folder
-    filename = ''
-    if folder == 'jacob':
-        jacob_saved = jacob_saved + 1
-        filename = 'jacob_from_app'+str(jacob_saved)+'.png'
-    if folder == 'not':
-        not_saved = not_saved + 1
-        filename = 'not_from_app'+str(not_saved)+'.png'
+    path = './data/test/jacob'
+    jacob_saved = jacob_saved + 1
+    filename = 'jacob_from_app'+str(jacob_saved)+'.png'
+    image.save(path / filename)
+    return PlainTextResponse('saved file ' + str(path) + '/' + filename)
+
+@app.route('/save/test/not', methods=['POST'])
+async def savetestnot(request):
+    print('saving to ./data/test/not')
+    img_bytes = await request.body()
+    image = Image.open(io.BytesIO(img_bytes))
+    path = './data/test/not'
+    not_saved = not_saved + 1
+    filename = 'not_from_app'+str(not_saved)+'.png'
+    image.save(path / filename)
+    return PlainTextResponse('saved file ' + str(path) + '/' + filename)
+        
     image.save(path / filename)
     return PlainTextResponse('saved file ' + str(path) + '/' + filename)
     
