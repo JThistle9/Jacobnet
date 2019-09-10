@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import uvicorn
-from PIL import Image
+import PIL.Image
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -75,7 +75,7 @@ async def predict(request):
 async def savetestjacob(request):
     print('saving to ./data/test/jacob')
     img_bytes = await request.body()
-    image = Image.open(io.BytesIO(img_bytes))
+    image = PIL.Image.open(io.BytesIO(img_bytes))
     path = './data/test/jacob'
     jacob_saved = jacob_saved + 1
     filename = 'jacob_from_app'+str(jacob_saved)+'.png'
@@ -86,7 +86,7 @@ async def savetestjacob(request):
 async def savetestnot(request):
     print('saving to ./data/test/not')
     img_bytes = await request.body()
-    image = Image.open(io.BytesIO(img_bytes))
+    image = PIL.Image.open(io.BytesIO(img_bytes))
     path = './data/test/not'
     not_saved = not_saved + 1
     filename = 'not_from_app'+str(not_saved)+'.png'
