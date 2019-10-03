@@ -2,6 +2,10 @@ import aiohttp
 import asyncio
 import uvicorn
 import PIL.Image
+import cv2
+import mtcnn
+from mtcnn.mtcnn import MTCNN
+import os
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -36,6 +40,7 @@ async def setup_learner():
     await download_file(export_file_url, path / export_file_name)
     try:
         learn = load_learner(path, export_file_name)
+        detector = MTCNN()
         return learn
     except RuntimeError as e:
         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
@@ -67,8 +72,24 @@ async def analyze(request):
 @app.route('/predict', methods=['POST'])
 async def predict(request):
     img_bytes = await request.body()
-    img = open_image(BytesIO(img_bytes))
-    prediction = learn.predict(img, thresh=0.7)[0]
+    result = detector.detect_faces(img_bytes)
+    
+    if (result != []):
+        x, y, width, height = result[0]['box']
+        x2, y2 = x+width, y+height
+        image = Image.open(BytesIO(img_bytes))
+        cropped_image = image.crop((x, y, x2, y2))
+        cropped_image.save("./tmp/cropped_image.png")
+        img = open_image("./tmp/cropped_image.png") 
+        prediction = learn.predict(img, thresh=0.7)[0]
+        if os.path.exists("./tmp/cropped_image.png"):
+            os.remove("./tmp/cropped_image.png")
+            print("cropped_image.png safely removed after use :)")
+        else:
+            print("The cropped_image.png did not exist :(")
+    else:
+        prediction = "not"
+        
     return PlainTextResponse(str(prediction))
 
 @app.route('/save/test/jacob', methods=['POST'])
@@ -79,7 +100,7 @@ async def savetestjacob(request):
     path = './data/test/jacob/'
     global jacob_saved
     jacob_saved = jacob_saved + 1
-    filename = 'jacob_from_app'+str(jacob_saved)+'.png'
+    filename = 'jacob_from_app_bb'+str(jacob_saved)+'.png'
     image.save(path + filename)
     return PlainTextResponse('saved file ' + path + filename)
 
@@ -91,7 +112,7 @@ async def savetestnot(request):
     path = './data/test/not/'
     global not_saved
     not_saved = not_saved + 1
-    filename = 'not_from_app'+str(not_saved)+'.png'
+    filename = 'not_from_app_bb'+str(not_saved)+'.png'
     image.save(path+filename)
     return PlainTextResponse('saved file ' + path + filename)
 
