@@ -11,4 +11,3 @@ python-multipart==0.0.5
 opencv-contrib-python==4.1.1.26
 tensorflow==1.14.0
 mtcnn==0.0.9
-libgtk2.0-dev
