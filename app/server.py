@@ -4,7 +4,7 @@ import uvicorn
 import PIL.Image
 import mtcnn
 from mtcnn.mtcnn import MTCNN
-#import os
+import os
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -15,7 +15,6 @@ from starlette.staticfiles import StaticFiles
 
 export_file_url = 'https://drive.google.com/uc?export=download&id=1aCAzP0bIsHWTp1EQg1nWrWCOJpZdahIq'
 export_file_name = 'bounding_box_model1.pkl'
-
 classes = ['jacob', 'not']
 not_saved = 0
 jacob_saved = 0
@@ -39,8 +38,7 @@ async def setup_learner():
     await download_file(export_file_url, path / export_file_name)
     try:
         learn = load_learner(path, export_file_name)
-        detector = MTCNN()
-        return learn, detector
+        return learn
     except RuntimeError as e:
         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
             print(e)
@@ -71,6 +69,7 @@ async def analyze(request):
 @app.route('/predict', methods=['POST'])
 async def predict(request):
     img_bytes = await request.body()
+    detector = MTCNN()
     result = detector.detect_faces(img_bytes)
     
     if (result != []):
@@ -81,11 +80,11 @@ async def predict(request):
         cropped_image.save("./tmp/cropped_image.png")
         img = open_image("./tmp/cropped_image.png") 
         prediction = learn.predict(img, thresh=0.7)[0]
-        #if os.path.exists("./tmp/cropped_image.png"):
-            #os.remove("./tmp/cropped_image.png")
-            #print("cropped_image.png safely removed after use :)")
-        #else:
-            #print("The cropped_image.png did not exist :(")
+        if os.path.exists("./tmp/cropped_image.png"):
+            os.remove("./tmp/cropped_image.png")
+            print("cropped_image.png safely removed after use :)")
+        else:
+            print("The cropped_image.png did not exist :(")
     else:
         prediction = "not"
         
