@@ -5,6 +5,7 @@ import PIL.Image
 import mtcnn
 from mtcnn.mtcnn import MTCNN
 import os
+import cv2
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -70,9 +71,10 @@ async def analyze(request):
 async def predict(request):
     img_bytes = await request.body()
     image = PIL.Image.open(io.BytesIO(img_bytes))
+    image.save("./tmp/image.png")
+    image = cv2.imread("./tmp/image.png")
     detector = MTCNN()
-    result = detector.detect_faces(image.convert("RGB"))
-    
+    result = detector.detect_faces(image)
     if (result != []):
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
@@ -80,11 +82,12 @@ async def predict(request):
         cropped_image.save("./tmp/cropped_image.png")
         img = open_image("./tmp/cropped_image.png") 
         prediction = learn.predict(img, thresh=0.7)[0]
-        if os.path.exists("./tmp/cropped_image.png"):
-            os.remove("./tmp/cropped_image.png")
-            print("cropped_image.png safely removed after use :)")
-        else:
-            print("The cropped_image.png did not exist :(")
+        for path in ["./tmp/cropped_image.png", "./tmp/image.png]:
+            if os.path.exists(path):
+                os.remove(path)
+                print(path + " safely removed after use :)")
+            else:
+                print("The " + path + " did not exist :(")
     else:
         prediction = "not"
         
