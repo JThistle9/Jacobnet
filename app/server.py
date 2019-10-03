@@ -13,8 +13,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from starlette.staticfiles import StaticFiles
 
-export_file_url = 'https://drive.google.com/uc?export=download&id=1TUItuJk3EtLAVSjniE0mAzgmgwK7rH8k'
-export_file_name = 'export.pkl'
+export_file_url = 'https://drive.google.com/uc?export=download&id=1aCAzP0bIsHWTp1EQg1nWrWCOJpZdahIq'
+export_file_name = 'bounding_box_model1.pkl'
 
 classes = ['jacob', 'not']
 not_saved = 0
