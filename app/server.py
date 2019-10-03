@@ -81,6 +81,7 @@ async def analyze(request):
     #find face in image
     result = detector.detect_faces(image_cv2)
     if (result != []): #if we found a face
+        global cropped_image_path
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
         cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
@@ -91,7 +92,8 @@ async def analyze(request):
         prediction = "not"
         
     #remove temp images made
-    for path in [cropped_image_path, image_path]:
+    paths = [cropped_image_path, image_path]
+    for path in paths:
         if os.path.exists(path):
             os.remove(path)
             print(path + " safely removed after use :)")
@@ -118,6 +120,7 @@ async def predict(request):
     #find face in image
     result = detector.detect_faces(image_cv2)
     if (result != []): #if we found a face
+        global cropped_image_path
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
         cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
@@ -129,7 +132,8 @@ async def predict(request):
         prediction = "not"
         
     #remove temp images made
-    for path in [cropped_image_path, image_path]:
+    paths = [cropped_image_path, image_path]
+    for path in paths:
         if os.path.exists(path):
             os.remove(path)
             print(path + " safely removed after use :)")
