@@ -18,7 +18,6 @@ export_file_url = 'https://drive.google.com/uc?export=download&id=1aCAzP0bIsHWTp
 export_file_name = 'bounding_box_model1.pkl'
 detector = MTCNN()
 
-#classes = ['jacob', 'not']
 temps_used = 0
 not_saved = 0
 jacob_saved = 0
@@ -65,15 +64,48 @@ async def homepage(request):
 
 @app.route('/analyze', methods=['POST'])
 async def analyze(request):
+    #getting input from web service request
     img_data = await request.form()
     img_bytes = await (img_data['file'].read())
-    img = open_image(BytesIO(img_bytes))
-    prediction = learn.predict(img)[0]
+    
+    #setting up variables and images
+    image_pil = PIL.Image.open(io.BytesIO(img_bytes))
+    global temps_used
+    global detector
+    temps_used = temps_used + 1
+    image_path = "./tmp/image"+str(temps_used)+".png"
+    cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png"
+    image_pil.save(image_path)
+    image_cv2 = cv2.imread(image_path)
+    
+    #find face in image
+    result = detector.detect_faces(image_cv2)
+    if (result != []): #if we found a face
+        x, y, width, height = result[0]['box']
+        x2, y2 = x+width, y+height
+        cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
+        cropped_image.save(cropped_image_path)         #save as cropped_image#.png in ./tmp
+        image_fastai = open_image(cropped_image_path) 
+        prediction = learn.predict(image_fastai, thresh=0.7)[0] #predict on newly cropped image
+        #remove temp images made
+        for path in [cropped_image_path, image_path]:
+            if os.path.exists(path):
+                os.remove(path)
+                print(path + " safely removed after use :)")
+            else:
+                print("The " + path + " did not exist :(")
+    else: #if we didn't find a face
+        prediction = "not"
+        
+    #return result
     return JSONResponse({'result': str(prediction)})
 
 @app.route('/predict', methods=['POST'])
 async def predict(request):
+    #getting input from app
     img_bytes = await request.body()
+    
+    #setting up variables and images
     image_pil = PIL.Image.open(io.BytesIO(img_bytes))
     global temps_used
     global detector
@@ -81,25 +113,28 @@ async def predict(request):
     image_path = "./tmp/image"+str(temps_used)+".png"
     image_pil.save(image_path)
     image_cv2 = cv2.imread(image_path)
-    #detector = MTCNN()
+    
+    #find face in image
     result = detector.detect_faces(image_cv2)
-    if (result != []):
+    if (result != []): #if we found a face
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
-        cropped_image = image_pil.crop((x, y, x2, y2))
-        cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png"
+        cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
+        cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png" #save as cropped_image#.png in ./tmp
         cropped_image.save(cropped_image_path)
         image_fastai = open_image(cropped_image_path) 
-        prediction = learn.predict(image_fastai, thresh=0.7)[0]
+        prediction = learn.predict(image_fastai, thresh=0.7)[0] #predict on newly cropped image
+        #remove temp images made
         for path in [cropped_image_path, image_path]:
             if os.path.exists(path):
                 os.remove(path)
                 print(path + " safely removed after use :)")
             else:
                 print("The " + path + " did not exist :(")
-    else:
+    else: #if we didn't find a face
         prediction = "not"
         
+    #return result
     return PlainTextResponse(str(prediction))
 
 @app.route('/save/test/jacob', methods=['POST'])
