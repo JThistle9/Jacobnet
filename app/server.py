@@ -4,7 +4,7 @@ import uvicorn
 import PIL.Image
 import mtcnn
 from mtcnn.mtcnn import MTCNN
-import os
+#import os
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
@@ -81,11 +81,11 @@ async def predict(request):
         cropped_image.save("./tmp/cropped_image.png")
         img = open_image("./tmp/cropped_image.png") 
         prediction = learn.predict(img, thresh=0.7)[0]
-        if os.path.exists("./tmp/cropped_image.png"):
-            os.remove("./tmp/cropped_image.png")
-            print("cropped_image.png safely removed after use :)")
-        else:
-            print("The cropped_image.png did not exist :(")
+        #if os.path.exists("./tmp/cropped_image.png"):
+            #os.remove("./tmp/cropped_image.png")
+            #print("cropped_image.png safely removed after use :)")
+        #else:
+            #print("The cropped_image.png did not exist :(")
     else:
         prediction = "not"
         
