@@ -81,7 +81,6 @@ async def analyze(request):
     #find face in image
     result = detector.detect_faces(image_cv2)
     if (result != []): #if we found a face
-        global cropped_image_path
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
         cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
@@ -114,17 +113,16 @@ async def predict(request):
     global detector
     temps_used = temps_used + 1
     image_path = "./tmp/image"+str(temps_used)+".png"
+    cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png"
     image_pil.save(image_path)
     image_cv2 = cv2.imread(image_path)
     
     #find face in image
     result = detector.detect_faces(image_cv2)
     if (result != []): #if we found a face
-        global cropped_image_path
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
         cropped_image = image_pil.crop((x, y, x2, y2)) #crop image to bounding box
-        cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png" #save as cropped_image#.png in ./tmp
         cropped_image.save(cropped_image_path)
         image_fastai = open_image(cropped_image_path) 
         prediction = learn.predict(image_fastai, thresh=0.7)[0] #predict on newly cropped image
