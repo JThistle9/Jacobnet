@@ -70,18 +70,18 @@ async def analyze(request):
 @app.route('/predict', methods=['POST'])
 async def predict(request):
     img_bytes = await request.body()
-    image = PIL.Image.open(io.BytesIO(img_bytes))
-    image.save("./tmp/image.png")
-    image = cv2.imread("./tmp/image.png")
+    PIL_image = PIL.Image.open(io.BytesIO(img_bytes))
+    PIL_image.save("./tmp/image.png")
+    cv2_image = cv2.imread("./tmp/image.png")
     detector = MTCNN()
-    result = detector.detect_faces(image)
+    result = detector.detect_faces(cv2_image)
     if (result != []):
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
-        cropped_image = image.crop((x, y, x2, y2))
+        cropped_image = PIL_image.crop((x, y, x2, y2))
         cropped_image.save("./tmp/cropped_image.png")
-        img = open_image("./tmp/cropped_image.png") 
-        prediction = learn.predict(img, thresh=0.7)[0]
+        fastai_img = open_image("./tmp/cropped_image.png") 
+        prediction = learn.predict(fastai_img, thresh=0.7)[0]
         for path in ["./tmp/cropped_image.png", "./tmp/image.png]:
             if os.path.exists(path):
                 os.remove(path)
