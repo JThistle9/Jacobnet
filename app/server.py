@@ -82,7 +82,7 @@ async def predict(request):
         cropped_image.save("./tmp/cropped_image.png")
         image_fastai = open_image("./tmp/cropped_image.png") 
         prediction = learn.predict(image_fastai, thresh=0.7)[0]
-        for path in ["./tmp/cropped_image.png", "./tmp/image.png]:
+        for path in ["./tmp/cropped_image.png", "./tmp/image.png"]:
             if os.path.exists(path):
                 os.remove(path)
                 print(path + " safely removed after use :)")
