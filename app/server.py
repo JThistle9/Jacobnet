@@ -87,16 +87,17 @@ async def analyze(request):
         cropped_image.save(cropped_image_path)         #save as cropped_image#.png in ./tmp
         image_fastai = open_image(cropped_image_path) 
         prediction = learn.predict(image_fastai, thresh=0.7)[0] #predict on newly cropped image
-        #remove temp images made
-        for path in [cropped_image_path, image_path]:
-            if os.path.exists(path):
-                os.remove(path)
-                print(path + " safely removed after use :)")
-            else:
-                print("The " + path + " did not exist :(")
     else: #if we didn't find a face
         prediction = "not"
         
+    #remove temp images made
+    for path in [cropped_image_path, image_path]:
+        if os.path.exists(path):
+            os.remove(path)
+            print(path + " safely removed after use :)")
+        else:
+            print("The " + path + " did not exist :(")
+            
     #return result
     return JSONResponse({'result': str(prediction)})
 
@@ -124,16 +125,17 @@ async def predict(request):
         cropped_image.save(cropped_image_path)
         image_fastai = open_image(cropped_image_path) 
         prediction = learn.predict(image_fastai, thresh=0.7)[0] #predict on newly cropped image
-        #remove temp images made
-        for path in [cropped_image_path, image_path]:
-            if os.path.exists(path):
-                os.remove(path)
-                print(path + " safely removed after use :)")
-            else:
-                print("The " + path + " did not exist :(")
     else: #if we didn't find a face
         prediction = "not"
         
+    #remove temp images made
+    for path in [cropped_image_path, image_path]:
+        if os.path.exists(path):
+            os.remove(path)
+            print(path + " safely removed after use :)")
+        else:
+            print("The " + path + " did not exist :(")
+            
     #return result
     return PlainTextResponse(str(prediction))
 
