@@ -40,7 +40,7 @@ async def setup_learner():
     try:
         learn = load_learner(path, export_file_name)
         detector = MTCNN()
-        return learn
+        return learn, detector
     except RuntimeError as e:
         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
             print(e)
