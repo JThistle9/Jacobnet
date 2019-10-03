@@ -16,9 +16,13 @@ from starlette.staticfiles import StaticFiles
 
 export_file_url = 'https://drive.google.com/uc?export=download&id=1aCAzP0bIsHWTp1EQg1nWrWCOJpZdahIq'
 export_file_name = 'bounding_box_model1.pkl'
-classes = ['jacob', 'not']
+detector = MTCNN()
+
+#classes = ['jacob', 'not']
+temps_used = 0
 not_saved = 0
 jacob_saved = 0
+
 path = Path(__file__).parent
 
 app = Starlette(debug=True)
@@ -71,18 +75,23 @@ async def analyze(request):
 async def predict(request):
     img_bytes = await request.body()
     image_pil = PIL.Image.open(io.BytesIO(img_bytes))
-    image_pil.save("./tmp/image.png")
-    image_cv2 = cv2.imread("./tmp/image.png")
-    detector = MTCNN()
+    global temps_used
+    global detector
+    temps_used = temps_used + 1
+    image_path = "./tmp/image"+str(temps_used)+".png"
+    image_pil.save(image_path)
+    image_cv2 = cv2.imread(image_path)
+    #detector = MTCNN()
     result = detector.detect_faces(image_cv2)
     if (result != []):
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
         cropped_image = image_pil.crop((x, y, x2, y2))
-        cropped_image.save("./tmp/cropped_image.png")
-        image_fastai = open_image("./tmp/cropped_image.png") 
+        cropped_image_path = "./tmp/cropped_image"+str(temps_used)+".png"
+        cropped_image.save(cropped_image_path)
+        image_fastai = open_image(cropped_image_path) 
         prediction = learn.predict(image_fastai, thresh=0.7)[0]
-        for path in ["./tmp/cropped_image.png", "./tmp/image.png"]:
+        for path in [cropped_image_path, image_path]:
             if os.path.exists(path):
                 os.remove(path)
                 print(path + " safely removed after use :)")
