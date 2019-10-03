@@ -2,7 +2,6 @@ import aiohttp
 import asyncio
 import uvicorn
 import PIL.Image
-import cv2
 import mtcnn
 from mtcnn.mtcnn import MTCNN
 import os
