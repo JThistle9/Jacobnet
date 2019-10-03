@@ -69,13 +69,13 @@ async def analyze(request):
 @app.route('/predict', methods=['POST'])
 async def predict(request):
     img_bytes = await request.body()
+    image = Image.open(BytesIO(img_bytes))
     detector = MTCNN()
-    result = detector.detect_faces(img_bytes)
+    result = detector.detect_faces(image.convert("RGB"))
     
     if (result != []):
         x, y, width, height = result[0]['box']
         x2, y2 = x+width, y+height
-        image = Image.open(BytesIO(img_bytes))
         cropped_image = image.crop((x, y, x2, y2))
         cropped_image.save("./tmp/cropped_image.png")
         img = open_image("./tmp/cropped_image.png") 
