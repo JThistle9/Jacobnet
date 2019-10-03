@@ -69,7 +69,7 @@ async def analyze(request):
 @app.route('/predict', methods=['POST'])
 async def predict(request):
     img_bytes = await request.body()
-    image = Image.open(BytesIO(img_bytes))
+    image = PIL.Image.open(io.BytesIO(img_bytes))
     detector = MTCNN()
     result = detector.detect_faces(image.convert("RGB"))
     
